@@ -13,22 +13,33 @@ static VACANT_SEARCH_URL: &'static str =
     "https://app.rakuten.co.jp/services/api/Travel/VacantHotelSearch/20170426";
 
 fn main() {
-    let task = foo();
+    let mut hotel_search_condition = create_serach_condition(vec![
+        ("middleClassCode", "akita"),
+        ("smallClassCode", "tazawa"),
+    ]);
+    let task = get_hotel_info(&mut hotel_search_condition);
     let _ = futures::executor::block_on(task);
 }
 
-async fn foo() -> Result<(), Box<dyn std::error::Error>> {
+fn create_serach_condition(input: Vec<(&str, &str)>) -> Vec<(String, String)> {
     let application_key = (env::var("APPLICATION_KEY"))
         .expect("should export environment variable APPLICATION_KEY to use RAKUTEN api");
 
+    let mut result: Vec<(String, String)> = input
+        .into_iter()
+        .map(|(key, value)| (key.to_string(), value.to_string()))
+        .collect();
+    result.push((String::from("largeClassCode"), String::from("japan")));
+    result.push((String::from("format"), String::from("json")));
+    result.push((String::from("applicationId"), application_key));
+    result
+}
+
+pub async fn get_hotel_info(
+    earch_condition: &mut Vec<(String, String)>,
+) -> Result<(), Box<dyn std::error::Error>> {
     let mut url_builder = URLBuilder::new(HOTEL_SEARCH_URL.to_string());
-    url_builder.add_queries(&mut vec![
-        ("format", "json"),
-        ("largeClassCode", "japan"),
-        ("middleClassCode", "akita"),
-        ("smallClassCode", "tazawa"),
-        ("applicationId", &application_key),
-    ]);
+    url_builder.add_queries(earch_condition);
 
     let endpoint_url = url_builder.to_string();
     let builder = Client::builder().build()?;

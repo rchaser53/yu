@@ -1,17 +1,17 @@
-pub struct URLBuilder<'a> {
+pub struct URLBuilder {
     base_url: String,
-    queries: Vec<(&'a str, &'a str)>,
+    queries: Vec<(String, String)>,
 }
 
-impl<'a> URLBuilder<'a> {
-    pub fn new(base_url: String) -> URLBuilder<'a> {
+impl<'a> URLBuilder {
+    pub fn new(base_url: String) -> URLBuilder {
         URLBuilder {
             base_url,
             queries: vec![],
         }
     }
 
-    pub fn add_queries(&mut self, queries: &mut Vec<(&'a str, &'a str)>) -> &mut Self {
+    pub fn add_queries(&mut self, queries: &mut Vec<(String, String)>) -> &mut Self {
         self.queries.append(queries);
         self
     }
