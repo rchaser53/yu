@@ -1,25 +1,28 @@
+use serde::{Deserialize, Serialize};
+use std::fmt;
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct PagingInfo {
-    record_count: usize,
+    pub record_count: usize,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HotelInfoResponse {
-    paging_info: PagingInfo,
-    hotels: Vec<HotelInfoMiddle>,
+    pub paging_info: PagingInfo,
+    pub hotels: Vec<HotelInfoMiddle>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HotelInfoMiddle {
-    hotel: Vec<HotelDataWrapper>,
+    pub hotel: Vec<HotelDataWrapper>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct HotelDataWrapper {
-    hotel_basic_info: Option<HotelData>,
+    pub hotel_basic_info: Option<HotelData>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -34,4 +37,69 @@ pub struct HotelData {
     pub nearest_station: Option<String>,
     pub review_count: Option<usize>,
     pub review_average: Option<f32>,
+}
+
+impl fmt::Display for HotelInfoMiddle {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut string_vec = Vec::with_capacity(self.hotel.len());
+        let result = self
+            .hotel
+            .iter()
+            .fold(&mut string_vec, |stack, hotel| {
+                if let Some(ref hotel) = hotel.hotel_basic_info {
+                    stack.push(format!("{}", hotel));
+                }
+                stack
+            })
+            .join("\n");
+
+        write!(f, "{}", result)
+    }
+}
+
+macro_rules! output_field {
+    ($info:expr) => {
+        if let Some(val) = $info {
+            format!("{}", val)
+        } else {
+            String::from("")
+        }
+    };
+}
+
+impl fmt::Display for HotelData {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut result = String::from("");
+        result.push_str(&format!("hotel_no               {}\n", self.hotel_no));
+        result.push_str(&format!("hotel_name             {}\n", self.hotel_name));
+        result.push_str(&format!(
+            "hotel_information_url, {}\n",
+            output_field!(&self.hotel_information_url)
+        ));
+        result.push_str(&format!(
+            "address1,              {}\n",
+            output_field!(&self.address1)
+        ));
+        result.push_str(&format!(
+            "address2,              {}\n",
+            output_field!(&self.address2)
+        ));
+        result.push_str(&format!(
+            "access,                {}\n",
+            output_field!(&self.access)
+        ));
+        result.push_str(&format!(
+            "nearest_station,       {}\n",
+            output_field!(&self.nearest_station)
+        ));
+        result.push_str(&format!(
+            "review_count,          {}\n",
+            output_field!(self.review_count)
+        ));
+        result.push_str(&format!(
+            "review_average,        {}\n",
+            output_field!(self.review_average)
+        ));
+        write!(f, "{}", result)
+    }
 }

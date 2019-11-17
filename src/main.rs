@@ -2,11 +2,10 @@ use reqwest;
 use reqwest::Client;
 use std::env;
 
+mod hotel_info;
+use hotel_info::HotelInfoResponse;
 mod url_builder;
 use url_builder::URLBuilder;
-
-// use futures::Future;
-// use reqwest::{Response, Error};
 
 static HOTEL_SEARCH_URL: &'static str =
     "https://app.rakuten.co.jp/services/api/Travel/SimpleHotelSearch/20170426";
@@ -35,6 +34,13 @@ async fn foo() -> Result<(), Box<dyn std::error::Error>> {
     let builder = Client::builder().build()?;
     let body = builder.get(&endpoint_url).send()?.text()?;
 
-    println!("body = {:?}", body);
+    let data: HotelInfoResponse = match serde_json::from_str(&body) {
+        Ok(data) => data,
+        Err(err) => panic!("{}", err),
+    };
+
+    for hotel in data.hotels {
+        println!("{}", hotel);
+    }
     Ok(())
 }
