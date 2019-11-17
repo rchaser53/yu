@@ -4,6 +4,9 @@ use std::env;
 
 mod hotel_info;
 use hotel_info::HotelInfoResponse;
+mod vacant_info;
+use vacant_info::VacantInfo;
+
 mod url_builder;
 use url_builder::URLBuilder;
 
@@ -13,11 +16,21 @@ static VACANT_SEARCH_URL: &'static str =
     "https://app.rakuten.co.jp/services/api/Travel/VacantHotelSearch/20170426";
 
 fn main() {
+    // let mut hotel_search_condition = create_serach_condition(vec![
+    //     ("middleClassCode", "akita"),
+    //     ("smallClassCode", "tazawa"),
+    // ]);
+    // let task = get_hotel_info(&mut hotel_search_condition);
+    // let _ = futures::executor::block_on(task);
+
     let mut hotel_search_condition = create_serach_condition(vec![
         ("middleClassCode", "akita"),
         ("smallClassCode", "tazawa"),
+        ("checkinDate", "2019-12-01"),
+        ("checkoutDate", "2019-12-02"),
+        ("adultNum", "1"),
     ]);
-    let task = get_hotel_info(&mut hotel_search_condition);
+    let task = get_vacant_info(&mut hotel_search_condition);
     let _ = futures::executor::block_on(task);
 }
 
@@ -53,5 +66,24 @@ pub async fn get_hotel_info(
     for hotel in data.hotels {
         println!("{}", hotel);
     }
+    Ok(())
+}
+
+pub async fn get_vacant_info(
+    earch_condition: &mut Vec<(String, String)>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let mut url_builder = URLBuilder::new(VACANT_SEARCH_URL.to_string());
+    url_builder.add_queries(earch_condition);
+
+    let endpoint_url = url_builder.to_string();
+    let builder = Client::builder().build()?;
+    let body = builder.get(&endpoint_url).send()?.text()?;
+
+    let data: VacantInfo = match serde_json::from_str(&body) {
+        Ok(data) => data,
+        Err(err) => panic!("{}", err),
+    };
+
+    println!("{:?}", data);
     Ok(())
 }

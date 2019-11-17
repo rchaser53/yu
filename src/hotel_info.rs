@@ -1,17 +1,17 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct PagingInfo {
-    pub record_count: usize,
-}
-
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HotelInfoResponse {
     pub paging_info: PagingInfo,
     pub hotels: Vec<HotelInfoMiddle>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct PagingInfo {
+    pub record_count: usize,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
