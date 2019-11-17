@@ -5,7 +5,7 @@ use std::fmt;
 #[serde(rename_all = "camelCase")]
 pub struct HotelInfoResponse {
     pub paging_info: PagingInfo,
-    pub hotels: Vec<HotelInfoMiddle>,
+    pub hotels: Vec<Hotels>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -15,19 +15,19 @@ pub struct PagingInfo {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct HotelInfoMiddle {
-    pub hotel: Vec<HotelDataWrapper>,
+pub struct Hotels {
+    pub hotel: Vec<Hotel>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct HotelDataWrapper {
-    pub hotel_basic_info: Option<HotelData>,
+pub struct Hotel {
+    pub hotel_basic_info: Option<HotelBasicInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct HotelData {
+pub struct HotelBasicInfo {
     pub hotel_no: usize,
     pub hotel_name: String,
     pub hotel_information_url: Option<String>,
@@ -39,7 +39,7 @@ pub struct HotelData {
     pub review_average: Option<f32>,
 }
 
-impl fmt::Display for HotelInfoMiddle {
+impl fmt::Display for Hotels {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut string_vec = Vec::with_capacity(self.hotel.len());
         let result = self
@@ -67,7 +67,7 @@ macro_rules! output_field {
     };
 }
 
-impl fmt::Display for HotelData {
+impl fmt::Display for HotelBasicInfo {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut result = String::from("");
         result.push_str(&format!("hotel_no               {}\n", self.hotel_no));

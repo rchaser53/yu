@@ -84,6 +84,9 @@ pub async fn get_vacant_info(
         Err(err) => panic!("{}", err),
     };
 
-    println!("{:?}", data);
+    for hotel in data.hotels {
+        println!("{}", hotel);
+    }
+
     Ok(())
 }
