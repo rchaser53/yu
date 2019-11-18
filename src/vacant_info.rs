@@ -1,6 +1,16 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
+macro_rules! output_field {
+    ($info:expr) => {
+        if let Some(val) = $info {
+            format!("{}", val)
+        } else {
+            String::from("")
+        }
+    };
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct VacantInfo {
@@ -60,15 +70,22 @@ pub struct DailyCharge {
 pub struct HotelBasicInfo {
     pub hotel_no: usize,
     pub hotel_name: String,
+    pub access: Option<String>,
+    pub nearest_station: Option<String>,
+    pub review_average: Option<f32>,
 }
 
 impl fmt::Display for Hotels {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut string_vec = Vec::with_capacity(self.hotel.len());
+        let mut should_break = false;
         let result = self
             .hotel
             .iter()
             .fold(&mut string_vec, |stack, hotel| {
+                if should_break {
+                    return stack;
+                }
                 match hotel {
                     Hotel::RoomInfo(room_info_vec) => {
                         let mut room_info_strs = String::from("");
@@ -78,11 +95,28 @@ impl fmt::Display for Hotels {
                         stack.push(room_info_strs);
                     }
                     Hotel::HotelBasicInfo(hotel_info) => {
-                        println!(
-                            "***************************************
-{}",
-                            hotel_info.hotel_name
-                        );
+                        if let Some(average) = hotel_info.review_average {
+                            if average < 3.8 {
+                                should_break = true;
+                                return stack;
+                            }
+
+                            println!(
+                                "***************************************
+name:             {}
+access:           {}
+near station:     {}
+review:           {}
+=======================================",
+                                &hotel_info.hotel_name,
+                                output_field!(&hotel_info.nearest_station),
+                                output_field!(&hotel_info.access),
+                                average,
+                            );
+                        } else {
+                            should_break = true;
+                            return stack;
+                        }
                     }
                 };
                 stack
@@ -91,16 +125,6 @@ impl fmt::Display for Hotels {
 
         write!(f, "{}", result)
     }
-}
-
-macro_rules! output_field {
-    ($info:expr) => {
-        if let Some(val) = $info {
-            format!("{}", val)
-        } else {
-            String::from("")
-        }
-    };
 }
 
 impl fmt::Display for RoomInfo {
