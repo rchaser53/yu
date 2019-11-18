@@ -24,7 +24,7 @@ pub struct Hotels {
 #[serde(rename_all = "camelCase")]
 pub enum Hotel {
     RoomInfo(Vec<RoomInfo>),
-    HotelBasicInfo(Option<HotelBasicInfo>),
+    HotelBasicInfo(HotelBasicInfo),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -59,6 +59,7 @@ pub struct DailyCharge {
 #[serde(rename_all = "camelCase")]
 pub struct HotelBasicInfo {
     pub hotel_no: usize,
+    pub hotel_name: String,
 }
 
 impl fmt::Display for Hotels {
@@ -76,7 +77,13 @@ impl fmt::Display for Hotels {
                         }
                         stack.push(room_info_strs);
                     }
-                    _ => {}
+                    Hotel::HotelBasicInfo(hotel_info) => {
+                        println!(
+                            "***************************************
+{}",
+                            hotel_info.hotel_name
+                        );
+                    }
                 };
                 stack
             })
