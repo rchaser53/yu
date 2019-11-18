@@ -16,7 +16,7 @@ impl<'a> URLBuilder {
         self
     }
 
-    pub fn join_url(&mut self, urls: Vec<&'a str>) -> &mut Self {
+    pub fn _join_url(&mut self, urls: Vec<&'a str>) -> &mut Self {
         let urls_len = urls.len();
         let mut url_strs: Vec<&'a str> = Vec::with_capacity(urls_len);
         for url in urls {

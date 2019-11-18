@@ -1,15 +1,14 @@
 use reqwest;
 use reqwest::Client;
-use serde_derive::Deserialize;
-use toml;
 
 use std::env;
-use std::fs;
 
 mod hotel_info;
 use hotel_info::HotelInfoResponse;
 mod vacant_info;
 use vacant_info::VacantInfo;
+mod config;
+use config::read_config;
 
 mod url_builder;
 use url_builder::URLBuilder;
@@ -19,20 +18,7 @@ static HOTEL_SEARCH_URL: &'static str =
 static VACANT_SEARCH_URL: &'static str =
     "https://app.rakuten.co.jp/services/api/Travel/VacantHotelSearch/20170426";
 
-#[derive(Debug, Deserialize)]
-struct SearchConfig {
-    conditions: Option<Vec<Condition>>,
-}
-
-#[derive(Debug, Deserialize)]
-struct Condition {
-    squeeze: Vec<String>,
-}
-
 fn main() {
-    let input = fs::read_to_string("condition.toml").expect("should exist condition.toml");
-    let result: SearchConfig = toml::from_str(&input).unwrap();
-
     let mut hotel_search_condition = create_serach_condition(vec![
         ("middleClassCode", "akita"),
         ("smallClassCode", "tazawa"),
