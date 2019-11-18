@@ -140,30 +140,30 @@ impl fmt::Display for RoomBasicInfo {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut result = String::from("");
         result.push_str(&format!(
-            "plan_id                {}\n",
+            "plan_id:                {}\n",
             output_field!(&self.plan_id)
         ));
         result.push_str(&format!(
-            "plan_name              {}\n",
+            "plan_name:              {}\n",
             output_field!(&self.plan_name)
         ));
         result.push_str(&format!(
-            "with_dinner_flag       {}\n",
+            "with_dinner_flag:       {}\n",
             self.with_dinner_flag
         ));
+        // result.push_str(&format!(
+        //     "dinner_select_flag:     {}\n",
+        //     self.dinner_select_flag
+        // ));
         result.push_str(&format!(
-            "dinner_select_flag     {}\n",
-            self.dinner_select_flag
-        ));
-        result.push_str(&format!(
-            "with_breakfast_flag    {}\n",
+            "with_breakfast_flag:    {}\n",
             self.with_breakfast_flag
         ));
-        result.push_str(&format!(
-            "breakfast_select_flag  {}\n",
-            self.breakfast_select_flag
-        ));
-        result.push_str(&format!("salesform_flag         {}\n", self.salesform_flag));
+        // result.push_str(&format!(
+        //     "breakfast_select_flag:  {}\n",
+        //     self.breakfast_select_flag
+        // ));
+        // result.push_str(&format!("salesform_flag         {}\n", self.salesform_flag));
         write!(f, "{}", result)
     }
 }
@@ -172,12 +172,12 @@ impl fmt::Display for DailyCharge {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut result = String::from("");
         result.push_str(&format!(
-            "stay_date              {}\n",
+            "stay_date:              {}\n",
             output_field!(&self.stay_date)
         ));
-        result.push_str(&format!("rakuten_charge         {}\n", self.rakuten_charge));
-        result.push_str(&format!("total                  {}\n", self.total));
-        result.push_str(&format!("charge_flag            {}\n", self.charge_flag));
+        // result.push_str(&format!("rakuten_charge         {}\n", self.rakuten_charge));
+        result.push_str(&format!("total:                  {}\n", self.total));
+        // result.push_str(&format!("charge_flag            {}\n", self.charge_flag));
         write!(f, "{}", result)
     }
 }

@@ -8,6 +8,9 @@ use std::path::Path;
 
 use crate::url_builder::URLBuilder;
 
+static VACANT_SEARCH_URL: &'static str =
+      "https://app.rakuten.co.jp/services/api/Travel/VacantHotelSearch/20170426";
+
 #[derive(Debug, Deserialize)]
 struct SearchConfig {
     pub conditions: Option<Vec<Condition>>,
@@ -15,7 +18,6 @@ struct SearchConfig {
 
 #[derive(Debug, Deserialize)]
 pub struct Condition {
-    pub target_url: String,
     pub squeeze: Vec<String>,
     pub prefecture: String,
     pub area: String,
@@ -45,7 +47,7 @@ pub fn create_url_builder<P: AsRef<Path>>(path: P) -> io::Result<Vec<URLBuilder>
                 ("squeezeCondition", &squeeze),
             ];
 
-            let mut url_builder = URLBuilder::new(condition.target_url.to_string());
+            let mut url_builder = URLBuilder::new(VACANT_SEARCH_URL.to_string());
             url_builder.add_queries(&mut create_serach_condition(queries));
             url_builder
         })

@@ -1,10 +1,16 @@
-# aaa = "bbb"
+[[conditions]]
+prefecture = "kanagawa"
+area = "yugawara"
+checkin = "2019-11-22"
+checkout = "2019-11-23"
+max_charge = 15000
+# squeeze = [ "kinen", "internet", "onsen", "dinner"]
+squeeze = [ "onsen", "dinner"]
 
 [[conditions]]
-target_url = "https://app.rakuten.co.jp/services/api/Travel/VacantHotelSearch/20170426"
-prefecture = "akita"
-area = "tazawa"
-checkin = "2019-12-01"
-checkout = "2019-12-02"
+prefecture = "kanagawa"
+area = "hakone"
+checkin = "2019-11-22"
+checkout = "2019-11-23"
 max_charge = 15000
-squeeze = [ "kinen", "internet", "onsen", "dinner"]
+squeeze = [ "onsen", "dinner"]
