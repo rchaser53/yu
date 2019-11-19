@@ -1,8 +1,7 @@
 use reqwest::Client;
 
-// use crate::hotel_info::HotelInfoResponse;
 use crate::url_builder::URLBuilder;
-use crate::vacant_info::VacantInfo;
+use crate::vacant_info::{Hotel, RoomInfo, VacantInfo};
 
 // static HOTEL_SEARCH_URL: &'static str =
 //     "https://app.rakuten.co.jp/services/api/Travel/SimpleHotelSearch/20170426";
@@ -28,7 +27,9 @@ use crate::vacant_info::VacantInfo;
 //     Ok(())
 // }
 
-pub async fn get_vacant_info(url_builder: URLBuilder) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn get_vacant_info(
+    url_builder: URLBuilder,
+) -> Result<String, Box<dyn std::error::Error>> {
     let endpoint_url = url_builder.to_string();
     let builder = Client::builder().build()?;
     let body = builder.get(&endpoint_url).send()?.text()?;
@@ -38,9 +39,20 @@ pub async fn get_vacant_info(url_builder: URLBuilder) -> Result<(), Box<dyn std:
         Err(err) => panic!("{}", err),
     };
 
-    for hotel in data.hotels {
-        println!("{}", hotel);
+    let mut result = String::from("");
+    if let Some(first) = data.hotels.first() {
+        if let Some(Hotel::RoomInfo(last_vec)) = first.hotel.last() {
+            if let Some(RoomInfo::DailyCharge(ref last)) = last_vec.last() {
+                if let Some(stay_date) = &last.stay_date {
+                    result.push_str(&format!("stay-date: {}\n", stay_date));
+                }
+            }
+        }
     }
 
-    Ok(())
+    for hotel in data.hotels {
+        result.push_str(&format!("{}\n", hotel));
+    }
+
+    Ok(result)
 }

@@ -9,7 +9,7 @@ use std::path::Path;
 use crate::url_builder::URLBuilder;
 
 static VACANT_SEARCH_URL: &'static str =
-      "https://app.rakuten.co.jp/services/api/Travel/VacantHotelSearch/20170426";
+    "https://app.rakuten.co.jp/services/api/Travel/VacantHotelSearch/20170426";
 
 #[derive(Debug, Deserialize)]
 struct SearchConfig {
