@@ -73,3 +73,32 @@ pub async fn get_vacant_info(
 
     Ok(result)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::url_builder::URLBuilder;
+    use futures::executor::block_on;
+    use mockito::{mock, server_url};
+    use serde_json::json;
+
+    #[test]
+    fn use_mockito_test() {
+        let res = json!({
+          "pagingInfo": {
+            "recordCount": 0,
+          },
+          "hotels": []
+        });
+
+        let _m = mock("GET", "/?")
+            .with_status(200)
+            .with_header("content-type", "application/json; charset=utf-8")
+            .with_body(res.to_string())
+            .create();
+        let url = server_url();
+        let url_builder = URLBuilder::new(url);
+        let result = block_on(get_vacant_info(url_builder)).unwrap();
+        assert_eq!(result, "");
+    }
+}
