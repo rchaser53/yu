@@ -1,3 +1,4 @@
+use anyhow::{Result};
 use serde_derive::Deserialize;
 use toml;
 
@@ -26,7 +27,7 @@ pub struct Condition {
     pub max_charge: usize,
 }
 
-pub fn create_url_builder<P: AsRef<Path>>(path: P) -> io::Result<Vec<URLBuilder>> {
+pub fn create_url_builder<P: AsRef<Path>>(path: P) -> Result<Vec<URLBuilder>> {
     let input = fs::read_to_string(path).expect("should exist condition.toml");
     let result: SearchConfig = toml::from_str(&input)?;
 
