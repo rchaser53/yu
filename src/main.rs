@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate anyhow;
+
 use anyhow::Result;
 
 mod hotel_info;
@@ -14,7 +17,10 @@ fn main() -> Result<()> {
     let url_builders = create_url_builder("condition.toml")?;
     for url_builder in url_builders {
         let task = get_vacant_info(url_builder);
-        let _ = futures::executor::block_on(task);
+        match futures::executor::block_on(task) {
+            Ok(result) => println!("{}", result),
+            Err(err) => panic!("{}", err),
+        };
     }
     Ok(())
 }

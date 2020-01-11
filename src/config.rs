@@ -1,10 +1,9 @@
-use anyhow::{Result};
+use anyhow::Result;
 use serde_derive::Deserialize;
 use toml;
 
 use std::env;
 use std::fs;
-use std::io;
 use std::path::Path;
 
 use crate::url_builder::URLBuilder;

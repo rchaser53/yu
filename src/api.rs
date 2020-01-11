@@ -1,3 +1,4 @@
+use anyhow::Result;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
@@ -41,9 +42,7 @@ pub enum Res {
     Error(RakutenAPIError),
 }
 
-pub async fn get_vacant_info(
-    url_builder: URLBuilder,
-) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn get_vacant_info(url_builder: URLBuilder) -> Result<String> {
     let endpoint_url = url_builder.to_string();
     let builder = Client::builder().build()?;
     let body = builder.get(&endpoint_url).send()?.text()?;
@@ -51,8 +50,14 @@ pub async fn get_vacant_info(
     let hotels = match serde_json::from_str(&body) {
         Ok(Res::Hotels(VacantInfo { hotels, .. })) => hotels,
         Ok(Res::Error(RakutenAPIError {
-            error_description, ..
-        })) => panic!("{}", error_description),
+            error_description,
+            error,
+        })) => {
+            if error == "not_found" {
+                return Err(anyhow!("no hotels hit"));
+            }
+            panic!("{}", error_description)
+        }
         Err(err) => panic!("{}", err),
     };
 
