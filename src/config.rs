@@ -32,19 +32,19 @@ pub fn create_url_builder<P: AsRef<Path>>(path: P) -> Result<Vec<URLBuilder>> {
 
     let conditions = result.conditions.expect("should have field conditions");
     let result = conditions
-        .iter()
+        .into_iter()
         .map(|condition| {
             let one = "1".to_string();
             let squeeze = condition.squeeze.join(",");
             let max_charge = condition.max_charge.to_string();
             let queries = vec![
-                ("middleClassCode", &condition.prefecture),
-                ("smallClassCode", &condition.area),
-                ("checkinDate", &condition.checkin),
-                ("checkoutDate", &condition.checkout),
-                ("adultNum", &one),
-                ("maxCharge", &max_charge),
-                ("squeezeCondition", &squeeze),
+                ("middleClassCode", condition.prefecture),
+                ("smallClassCode", condition.area),
+                ("checkinDate", condition.checkin),
+                ("checkoutDate", condition.checkout),
+                ("adultNum", one),
+                ("maxCharge", max_charge),
+                ("squeezeCondition", squeeze),
             ];
 
             let mut url_builder = URLBuilder::new(VACANT_SEARCH_URL.to_string());
