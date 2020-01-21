@@ -1,7 +1,9 @@
 use anyhow::Result;
+use chrono::prelude::*;
 use serde_derive::Deserialize;
 use toml;
 
+use std::cmp::Ordering::Equal;
 use std::env;
 use std::fs;
 use std::path::Path;
@@ -26,6 +28,14 @@ pub struct Condition {
     pub max_charge: usize,
 }
 
+fn validate_checkin_date(queries: &mut Vec<(&str, String)>) {
+    for elem in queries {
+        if elem.0 == "checkinDate" {
+            elem.1 = String::from("2020-01-22");
+        }
+    }
+}
+
 pub fn create_url_builder<P: AsRef<Path>>(path: P) -> Result<Vec<URLBuilder>> {
     let input = fs::read_to_string(path).expect("should exist condition.toml");
     let result: SearchConfig = toml::from_str(&input)?;
@@ -37,10 +47,19 @@ pub fn create_url_builder<P: AsRef<Path>>(path: P) -> Result<Vec<URLBuilder>> {
             let one = "1".to_string();
             let squeeze = condition.squeeze.join(",");
             let max_charge = condition.max_charge.to_string();
+
+            let today: DateTime<Local> = Local::now();
+            let checkin_date = format!("{}T00:00:00", condition.checkin).parse().unwrap();
+            let checkin_date_str = if today.naive_local().cmp(&checkin_date) > Equal {
+                condition.checkin
+            } else {
+                today.format("%F").to_string()
+            };
+
             let queries = vec![
                 ("middleClassCode", condition.prefecture),
                 ("smallClassCode", condition.area),
-                ("checkinDate", condition.checkin),
+                ("checkinDate", checkin_date_str),
                 ("checkoutDate", condition.checkout),
                 ("adultNum", one),
                 ("maxCharge", max_charge),
@@ -52,6 +71,8 @@ pub fn create_url_builder<P: AsRef<Path>>(path: P) -> Result<Vec<URLBuilder>> {
             url_builder
         })
         .collect();
+
+    // assert_eq!(DateTime::parse_from_str("2014-11-28 21:00:09 +09:00", "%Y-%m-%d %H:%M:%S %z"),
     Ok(result)
 }
 
