@@ -48,19 +48,24 @@ pub fn create_url_builder<P: AsRef<Path>>(path: P) -> Result<Vec<URLBuilder>> {
             let squeeze = condition.squeeze.join(",");
             let max_charge = condition.max_charge.to_string();
 
-            let today: DateTime<Local> = Local::now();
-            let checkin_date = format!("{}T00:00:00", condition.checkin).parse().unwrap();
-            let checkin_date_str = if today.naive_local().cmp(&checkin_date) > Equal {
-                condition.checkin
-            } else {
-                today.format("%F").to_string()
-            };
+            let today = Local::today();
+            let checkin_date = condition.checkin.parse().unwrap();
+            let (checkin_date_str, checkout_date_str) =
+                if today.naive_local().cmp(&checkin_date) > Equal {
+                    (condition.checkin, condition.checkout)
+                } else {
+                    let tommorow = today.succ();
+                    (
+                        tommorow.format("%F").to_string(),
+                        tommorow.succ().format("%F").to_string(),
+                    )
+                };
 
             let queries = vec![
                 ("middleClassCode", condition.prefecture),
                 ("smallClassCode", condition.area),
                 ("checkinDate", checkin_date_str),
-                ("checkoutDate", condition.checkout),
+                ("checkoutDate", checkout_date_str),
                 ("adultNum", one),
                 ("maxCharge", max_charge),
                 ("squeezeCondition", squeeze),
