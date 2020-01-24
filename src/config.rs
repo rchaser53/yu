@@ -28,14 +28,6 @@ pub struct Condition {
     pub max_charge: usize,
 }
 
-fn validate_checkin_date(queries: &mut Vec<(&str, String)>) {
-    for elem in queries {
-        if elem.0 == "checkinDate" {
-            elem.1 = String::from("2020-01-22");
-        }
-    }
-}
-
 pub fn create_url_builder<P: AsRef<Path>>(path: P) -> Result<Vec<URLBuilder>> {
     let input = fs::read_to_string(path).expect("should exist condition.toml");
     let result: SearchConfig = toml::from_str(&input)?;
@@ -51,9 +43,11 @@ pub fn create_url_builder<P: AsRef<Path>>(path: P) -> Result<Vec<URLBuilder>> {
             let today = Local::today();
             let checkin_date = condition.checkin.parse().unwrap();
             let (checkin_date_str, checkout_date_str) =
-                if today.naive_local().cmp(&checkin_date) > Equal {
+                if today.naive_local().cmp(&checkin_date) < Equal {
                     (condition.checkin, condition.checkout)
                 } else {
+                    println!("{} is already passed. emits tomorrow info\n", checkin_date);
+
                     let tommorow = today.succ();
                     (
                         tommorow.format("%F").to_string(),
